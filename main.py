@@ -12,18 +12,23 @@ window.configure(background="#9C3587") #color
 w = 860
 h = 400
 window.geometry(f"{w}x{h}")
+window.eval('tk::PlaceWindow . center')
 
+
+#creating the global variables
 filepath = {}
-selectedextensions = ["JPEG/JPG", "PNG"]
-originalExtension = []
+selectedextensions = ["JPEG/JPG", "PNG", "WEBP", "ICNs"]
+originalExtensions = []
+filenames = []
 
 
 def openfile():
     #opening the finder to search for images
     files = filedialog.askopenfiles(title="Select Image Type")
-    #declaring the global variables
+    #initializing the global variables
     global filepath
-    global originalExtension 
+    global originalExtensions
+    global filenames 
 
 
 
@@ -35,11 +40,12 @@ def openfile():
             file_frame = tk.Frame(master=files_frame, highlightbackground="#E53F71", highlightthickness=3)
             Filename_label = tk.Label(master = file_frame, text=os.path.splitext(os.path.basename(file_path.name))[0], foreground="green", background="yellow", borderwidth=3)
             Filename_label.pack(side="left")
+            filenames.append(os.path.splitext(os.path.basename(file_path.name))[0])
             
             Fileextension_label = tk.Label(master = file_frame, text=os.path.splitext(file_path.name)[1:], foreground="green", background="yellow", borderwidth=3)
             Fileextension_label.pack(side="left", padx=10)
             
-            originalExtension = os.path.splitext(file_path.name)[1:]
+            originalExtensions.append(os.path.splitext(file_path.name)[1:])
             clicked = tk.StringVar()
             clicked.set(selectedextensions[0])
   
@@ -60,17 +66,24 @@ def openfile():
         print("No files selected.")
 
 def convertfile():
+    #initializing the global variables
     global filepath
-    global originalExtension 
-    print (filepath)
+    global originalExtensions
+    global filenames 
+    #print (filepath)
+    #print (originalExtensions)
 
-    for image_path, selected_extension in filepath.items():
+
+    for image_path, selected_extension, originalExtension, filename in zip(filepath.keys(), filepath.values(), originalExtensions, filenames):
             image = Image.open(image_path)
             extension = selected_extension.get()
-            if extension == "PNG":
-                image.save(os.path.dirname(image_path) + "/LOL.png")
-                print(os.path.dirname(image_path) + "/LOL.png")
-                image.show()
+            if originalExtension != extension:
+                if extension == "JPEG/JPG":
+                 extension = "JPG"
+                if extension in ["PNG", "WEBP", "JPG"]:
+                    image.save(f"{os.path.dirname(image_path)}/{filename}.{extension}")
+                    print(f"{os.path.dirname(image_path)}/{filename}.{extension}")
+                    image.show()
 
 
 
